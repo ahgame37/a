@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Portal</title>
+</head>
+<body>
+    <h1>Download Portal</h1>
+    <p id="linkMessage">Checking available download link...</p>
+    <button id="downloadButton" onclick="visitLink()">Get Download Link</button>
+
+    <script>
+        // Function to retrieve URL parameters
+        function getURLParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Retrieve shortlink back-halves from URL parameters
+        const shortlinks = {
+            "a": `https://bit.ly/${getURLParameter("a")}`,
+            "b": `https://safelinku.com/${getURLParameter("b")}`,
+            "c": `https://ouo.io/${getURLParameter("c")}`
+        };
+
+        // Set the expiration time for link access in milliseconds (25 hours)
+        const expirationTime = 25 * 60 * 60 * 1000;
+
+        // Check if a link has expired
+        function isExpired(linkKey) {
+            const lastVisitTime = localStorage.getItem(`visited-${linkKey}-timestamp`);
+            if (!lastVisitTime) return true; // If no timestamp, consider it expired
+
+            const currentTime = Date.now();
+            return currentTime - parseInt(lastVisitTime) > expirationTime;
+        }
+
+        // Check which shortlink to serve based on visit history and expiration
+        function getNextLink() {
+            for (const key of ["a", "b", "c"]) {
+                if (!localStorage.getItem(`visited-${shortlinks[key]}`) || isExpired(shortlinks[key])) {
+                    return { key, url: shortlinks[key] };
+                }
+            }
+            return null; // All links have been visited recently
+        }
+
+        // Handle visiting the link and update localStorage
+        function visitLink() {
+            const nextLink = getNextLink();
+            if (nextLink) {
+                window.open(nextLink.url, "_blank");
+                // Mark the link as visited and save the current timestamp
+                localStorage.setItem(`visited-${nextLink.url}`, "true");
+                localStorage.setItem(`visited-${nextLink.url}-timestamp`, Date.now().toString());
+                displayLinkMessage();
+            } else {
+                alert("EN: IP limit exceeded. Please refresh your IP (airplane mode for 10 seconds & clear browser data) or try again after 25 hours.\n\nID: Batas IP terlampaui. Harap segarkan IP Anda (mode pesawat selama 10 detik & hapus data browser) atau coba lagi setelah 25 jam.");
+            }
+        }
+
+        // Display the current link message
+        function displayLinkMessage() {
+            const nextLink = getNextLink();
+            const linkMessage = document.getElementById("linkMessage");
+
+            if (nextLink) {
+                linkMessage.textContent = `Your next available download link is Link ${nextLink.key.toUpperCase()}. Click the button below to proceed.`;
+            } else {
+                linkMessage.textContent = "EN: IP limit exceeded. Please refresh your IP (airplane mode for 10 seconds & clear browser data) or try again after 25 hours.\n\nID: Batas IP terlampaui. Harap segarkan IP Anda (mode pesawat selama 10 detik & hapus data browser) atau coba lagi setelah 25 jam.";
+                document.getElementById("downloadButton").disabled = true;
+            }
+        }
+
+        // Initialize the message on page load
+        displayLinkMessage();
+    </script>
+</body>
+</html>
