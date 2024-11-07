@@ -81,6 +81,7 @@
 
         // Set expiration time (25 hours in milliseconds)
         const expirationTime = 25 * 60 * 60 * 1000;
+        const maxSnacklinkVisits = 3;
 
         // Check if a link has expired based on domain
         function isExpired(domain) {
@@ -94,7 +95,12 @@
         // Get the next available link based on domain visits
         function getNextLink() {
             for (const [domain, url] of Object.entries(shortlinks)) {
-                if (!localStorage.getItem(`visited-${domain}`) || isExpired(domain)) {
+                if (domain === "snacklink") {
+                    const visitCount = parseInt(localStorage.getItem("snacklink-visit-count") || "0");
+                    if (visitCount < maxSnacklinkVisits || isExpired("snacklink")) {
+                        return { domain, url, visitCount };
+                    }
+                } else if (!localStorage.getItem(`visited-${domain}`) || isExpired(domain)) {
                     return { domain, url };
                 }
             }
@@ -106,9 +112,19 @@
             const nextLink = getNextLink();
             if (nextLink) {
                 window.open(nextLink.url, "_blank");
-                // Mark the domain as visited and save the current timestamp
-                localStorage.setItem(`visited-${nextLink.domain}`, "true");
-                localStorage.setItem(`visited-${nextLink.domain}-timestamp`, Date.now().toString());
+                
+                if (nextLink.domain === "snacklink") {
+                    let visitCount = nextLink.visitCount;
+                    if (isExpired("snacklink")) {
+                        visitCount = 0; // Reset count if expired
+                    }
+                    visitCount++;
+                    localStorage.setItem("snacklink-visit-count", visitCount.toString());
+                    localStorage.setItem("visited-snacklink-timestamp", Date.now().toString());
+                } else {
+                    localStorage.setItem(`visited-${nextLink.domain}`, "true");
+                    localStorage.setItem(`visited-${nextLink.domain}-timestamp`, Date.now().toString());
+                }
                 displayLinkMessage();
             } else {
                 alert("EN: IP limit exceeded. Please refresh your IP (airplane mode for 10 seconds & clear browser data) or try again after 25 hours.\n\nID: Batas IP terlampaui. Harap segarkan IP Anda (mode pesawat selama 10 detik & hapus data browser) atau coba lagi setelah 25 jam.");
