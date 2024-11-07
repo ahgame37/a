@@ -11,62 +11,74 @@
     <button id="downloadButton" onclick="visitLink()">Get Download Link</button>
 
     <script>
-        // Function to retrieve URL parameters
+        // Retrieve URL parameters
         function getURLParameter(name) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(name);
         }
 
         // Retrieve shortlink back-halves from URL parameters
+        const uniqueA = getURLParameter("a");
+        const uniqueB = getURLParameter("b");
+        const uniqueC = getURLParameter("c");
+
+        // Check for missing parameters
+        if (!uniqueA || !uniqueB || !uniqueC) {
+            document.getElementById("linkMessage").textContent = "Error 404 link";
+            document.getElementById("downloadButton").disabled = true;
+            throw new Error("Missing shortlink parameters");
+        }
+
+        // Shortlink domains and corresponding back-halves
         const shortlinks = {
-            "a": `https://bit.ly/${getURLParameter("a")}`,
-            "b": `https://safelinku.com/${getURLParameter("b")}`,
-            "c": `https://ouo.io/${getURLParameter("c")}`
+            "bitly": `https://bit.ly/${uniqueA}`,
+            "safelinku": `https://safelinku.com/${uniqueB}`,
+            "ouoio": `https://ouo.io/${uniqueC}`
         };
 
-        // Set the expiration time for link access in milliseconds (25 hours)
+        // Set expiration time (25 hours in milliseconds)
         const expirationTime = 25 * 60 * 60 * 1000;
 
-        // Check if a link has expired
-        function isExpired(linkKey) {
-            const lastVisitTime = localStorage.getItem(`visited-${linkKey}-timestamp`);
+        // Check if a link has expired based on domain
+        function isExpired(domain) {
+            const lastVisitTime = localStorage.getItem(`visited-${domain}-timestamp`);
             if (!lastVisitTime) return true; // If no timestamp, consider it expired
 
             const currentTime = Date.now();
             return currentTime - parseInt(lastVisitTime) > expirationTime;
         }
 
-        // Check which shortlink to serve based on visit history and expiration
+        // Get the next available link based on domain visits
         function getNextLink() {
-            for (const key of ["a", "b", "c"]) {
-                if (!localStorage.getItem(`visited-${shortlinks[key]}`) || isExpired(shortlinks[key])) {
-                    return { key, url: shortlinks[key] };
+            for (const [domain, url] of Object.entries(shortlinks)) {
+                if (!localStorage.getItem(`visited-${domain}`) || isExpired(domain)) {
+                    return { domain, url };
                 }
             }
             return null; // All links have been visited recently
         }
 
-        // Handle visiting the link and update localStorage
+        // Visit the selected link and store visit info by domain
         function visitLink() {
             const nextLink = getNextLink();
             if (nextLink) {
                 window.open(nextLink.url, "_blank");
-                // Mark the link as visited and save the current timestamp
-                localStorage.setItem(`visited-${nextLink.url}`, "true");
-                localStorage.setItem(`visited-${nextLink.url}-timestamp`, Date.now().toString());
+                // Mark the domain as visited and save the current timestamp
+                localStorage.setItem(`visited-${nextLink.domain}`, "true");
+                localStorage.setItem(`visited-${nextLink.domain}-timestamp`, Date.now().toString());
                 displayLinkMessage();
             } else {
                 alert("EN: IP limit exceeded. Please refresh your IP (airplane mode for 10 seconds & clear browser data) or try again after 25 hours.\n\nID: Batas IP terlampaui. Harap segarkan IP Anda (mode pesawat selama 10 detik & hapus data browser) atau coba lagi setelah 25 jam.");
             }
         }
 
-        // Display the current link message
+        // Display the next available link message
         function displayLinkMessage() {
             const nextLink = getNextLink();
             const linkMessage = document.getElementById("linkMessage");
 
             if (nextLink) {
-                linkMessage.textContent = `Your next available download link is Link ${nextLink.key.toUpperCase()}. Click the button below to proceed.`;
+                linkMessage.textContent = `Your next available download link is on ${nextLink.domain}. Click the button below to proceed.`;
             } else {
                 linkMessage.textContent = "EN: IP limit exceeded. Please refresh your IP (airplane mode for 10 seconds & clear browser data) or try again after 25 hours.\n\nID: Batas IP terlampaui. Harap segarkan IP Anda (mode pesawat selama 10 detik & hapus data browser) atau coba lagi setelah 25 jam.";
                 document.getElementById("downloadButton").disabled = true;
