@@ -123,7 +123,7 @@
                 currentShortlink: "Shortlink yang akan kalian lewati adalah"
             }
         };
-        
+
         let currentLanguage = navigator.language.startsWith("id") ? "id" : "en";
         let currentShortlinkService = ""; // Store the current shortlink service name
 
@@ -202,8 +202,7 @@
                 localStorage.setItem("visitCounts", JSON.stringify(visitCounts));
             }
 
-            document.getElementById("downloadButton").style.display = "inline-block";
-            updateText();
+            document.getElementById("downloadButton").style.display = "block";
         }
     </script>
 </body>
