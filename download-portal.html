@@ -176,6 +176,10 @@
             const cutyio = `https://cuty.io/${uniqueB}`;
             const snacklink = `https://moneyblink.com/${uniqueC}`;
 
+            // Initialize the first shortlink message
+            let nextShortlinkService = visitCounts.b < 1 ? "Cuty" : visitCounts.a < 1 ? "SafelinkU" : visitCounts.c < 6 ? "SnackLink" : "";
+            updateShortlinkMessage(nextShortlinkService);
+
             function getDownloadLink() {
                 if (visitCounts.b < 1) {
                     visitCounts.b++;
