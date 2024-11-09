@@ -16,12 +16,12 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            color: #000;
+            color: #fff;
         }
         
         /* Overlay container for readability */
         .container {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.1);
             padding: 20px;
             border-radius: 10px;
             width: 90%;
@@ -42,13 +42,7 @@
             margin: 10px 0;
             line-height: 1.5;
             font-weight: 500;
-        }
-
-        /* Highlighted instructional text with pink and black stroke */
-        .highlight {
-            color: #ff4081; /* Pink accent */
-            font-weight: bold;
-            text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            color: #fff;
         }
 
         /* Button styling */
@@ -85,8 +79,9 @@
     <div class="container">
         <h1>HPXLI H Game Download Portal</h1>
         <p id="message">Checking available links...</p>
-        <button class="button" id="downloadButton" onclick="getDownloadLink()" style="display:none;">Get Download Link</button>
         <p id="instruction" class="highlight"></p>
+        <p id="hostInfo" class="highlight"></p>
+        <button class="button" id="downloadButton" onclick="getDownloadLink()" style="display:none;">Get Download Link</button>
         <p id="supportMessage" class="highlight"></p>
     </div>
 
@@ -103,14 +98,18 @@
                 initialMessage: "Please click the button below to access the link.",
                 instruction: "Please close this tab after clicking the 'Get Download Link' button below to avoid errors.",
                 supportMessage: "Shortlinks are used to support this website. Thank you for your understanding!",
-                limitExceeded: "EN : IP limit exceeded. Please change refresh your IP (airplane mode 10 sec & remove browser) or try again after 25 hours."
+                limitExceeded: "EN : IP limit exceeded. Please change refresh your IP (airplane mode 10 sec & remove browser) or try again after 25 hours.",
+                hostInfo: "To access the file hosting (e.g., Drive), you need to go through a shortlink first.",
+                currentShortlink: "The shortlink you are about to go through is"
             },
             id: {
                 nextLink: "Link selanjutnya Anda",
                 initialMessage: "Silahkan klik tombol di bawah ini untuk mengakses link.",
                 instruction: "Tolong tutup tab ini jika sudah mengklik tombol 'Get Download Link' dibawah agar tidak terjadi error.",
                 supportMessage: "Shortlink digunakan untuk mensupport website ini mohon pengertiannya ya!",
-                limitExceeded: "ID : Batas IP terlampaui. Harap ubah penyegaran IP Anda (mode pesawat 10 detik & hapus browser) atau coba lagi setelah 25 jam."
+                limitExceeded: "ID : Batas IP terlampaui. Harap ubah penyegaran IP Anda (mode pesawat 10 detik & hapus browser) atau coba lagi setelah 25 jam.",
+                hostInfo: "Untuk menuju ke hosting file (contoh: Drive) kalian harus melewati shortlink terlebih dahulu.",
+                currentShortlink: "Shortlink yang akan kalian lewati adalah"
             }
         };
         
@@ -125,6 +124,11 @@
             document.getElementById("message").textContent = translations[currentLanguage].initialMessage;
             document.getElementById("instruction").textContent = translations[currentLanguage].instruction;
             document.getElementById("supportMessage").textContent = translations[currentLanguage].supportMessage;
+            document.getElementById("hostInfo").textContent = translations[currentLanguage].hostInfo;
+        }
+
+        function updateShortlinkMessage(serviceName) {
+            document.getElementById("message").textContent = `${translations[currentLanguage].currentShortlink}: ${serviceName}`;
         }
 
         if (!uniqueA || !uniqueB || !uniqueC) {
@@ -139,15 +143,15 @@
                 if (visits.a < 2) {
                     visits.a++;
                     window.open(safelinku, "_blank");
-                    document.getElementById("message").textContent = `${translations[currentLanguage].nextLink}: cuty.io`;
+                    updateShortlinkMessage("SafelinkU");
                 } else if (visits.b < 1) {
                     visits.b++;
                     window.open(cutyio, "_blank");
-                    document.getElementById("message").textContent = `${translations[currentLanguage].nextLink}: snacklink`;
-                } else if (visits.c < 3) {
+                    updateShortlinkMessage("Cuty");
+                } else if (visits.c < 5) {
                     visits.c++;
                     window.open(snacklink, "_blank");
-                    document.getElementById("message").textContent = `${translations[currentLanguage].nextLink}: safelinku`;
+                    updateShortlinkMessage("SnackLink");
                 } else {
                     document.getElementById("message").innerHTML = translations[currentLanguage].limitExceeded;
                 }
