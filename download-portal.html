@@ -3,207 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HPXLI H Game Download Portal</title>
+    <title>Download Portal</title>
     <style>
-        /* Soft black background styling */
+        /* Set background image and styles */
         body {
-            background-color: #1a1a1a;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            color: #fff;
-        }
-        
-        /* Overlay container for readability */
-        .container {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 500px;
+            background-image: url('https://raw.githubusercontent.com/ahgame37/a/refs/heads/main/istockphoto-1359818120-612x612.jpg');
+            background-size: cover;
+            background-position: center;
+            color: white;
             text-align: center;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+            font-family: Arial, sans-serif;
         }
 
-        /* Main title styling */
+        /* Style the main heading */
         h1 {
-            font-size: 24px;
-            color: #ff4081; /* Pink accent for the title */
-            margin-bottom: 10px;
-        }
-
-        /* General text styling */
-        p {
-            margin: 10px 0;
-            line-height: 1.5;
-            font-weight: 500;
-            color: #fff;
-        }
-
-        /* Button styling */
-        .button {
-            padding: 10px 20px;
             margin-top: 20px;
-            background-color: #ff4081;
-            color: #fff;
+            font-size: 2em;
             font-weight: bold;
+            color: #ffcc00; /* Light yellow for better contrast */
+        }
+
+        /* Style for the message and button */
+        #linkMessage {
+            margin-top: 20px;
+            font-size: 1.2em;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            display: inline-block;
+        }
+
+        #downloadButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #ffcc00;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .button:hover {
-            background-color: #e03570;
-        }
-
-        /* Language toggle button */
-        .language-toggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 5px;
-            background-color: #ff4081;
-            color: #fff;
-            border-radius: 5px;
-            font-weight: bold;
+            color: black;
             cursor: pointer;
         }
 
-        /* New text styles */
-        .highlighted-text {
-            color: #ff4081; /* Pink accent color */
-        }
-        .blue-text {
-            color: #4da6ff; /* Soft blue color */
-        }
-        .yellow-text {
-            color: #ffd700; /* Soft yellow color */
+        #downloadButton:disabled {
+            background-color: #888;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
-    <div class="language-toggle" onclick="toggleLanguage()">EN / ID</div>
-    <div class="container">
-        <h1>HPXLI H Game Download Portal</h1>
-        <p id="message">Checking available links...</p>
-        <p id="instruction" class="highlight"></p>
-        <p id="hostInfo" class="highlight"></p>
-        <button class="button" id="downloadButton" onclick="getDownloadLink()" style="display:none;">Get Download Link</button>
-        <p id="supportMessage" class="highlighted-text"></p>
-    </div>
+    <h1>HPXLI H Game Download Portal</h1>
+    <p id="linkMessage">Checking available download link...</p>
+    <button id="downloadButton" onclick="visitLink()">Get Download Link</button>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const uniqueA = params.get("a");
-        const uniqueB = params.get("b");
-        const uniqueC = params.get("c");
+        // Retrieve URL parameters
+        function getURLParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
 
-        // Language settings
-        const translations = {
-            en: {
-                nextLink: "Your next link",
-                initialMessage: "Please click the button below to access the link.",
-                instruction: "Please close this tab after clicking the 'Get Download Link' button below to avoid errors.",
-                supportMessage: "Shortlinks are used to support this website. Thank you for your understanding!",
-                limitExceeded: "EN : IP limit exceeded. Please change refresh your IP (airplane mode 10 sec & remove browser) or try again after 25 hours.",
-                hostInfo: "To access the file hosting (e.g., Drive), you need to go through a shortlink first.",
-                currentShortlink: "The shortlink you are about to go through is"
-            },
-            id: {
-                nextLink: "Link selanjutnya Anda",
-                initialMessage: "Silahkan klik tombol di bawah ini untuk mengakses link.",
-                instruction: "Tolong tutup tab ini jika sudah mengklik tombol 'Get Download Link' dibawah agar tidak terjadi error.",
-                supportMessage: "Shortlink digunakan untuk mensupport website ini mohon pengertiannya ya!",
-                limitExceeded: "ID : Batas IP terlampaui. Harap ubah penyegaran IP Anda (mode pesawat 10 detik & hapus browser) atau coba lagi setelah 25 jam.",
-                hostInfo: "Untuk menuju ke hosting file (contoh: Drive) kalian harus melewati shortlink terlebih dahulu.",
-                currentShortlink: "Shortlink yang akan kalian lewati adalah"
-            }
+        // Retrieve shortlink back-halves from URL parameters
+        const uniqueA = getURLParameter("a");
+        const uniqueB = getURLParameter("b");
+        const uniqueC = getURLParameter("c");
+
+        // Check for missing parameters
+        if (!uniqueA || !uniqueB || !uniqueC) {
+            document.getElementById("linkMessage").textContent = "Error 404 link";
+            document.getElementById("downloadButton").disabled = true;
+            throw new Error("Missing shortlink parameters");
+        }
+
+        // Shortlink domains and corresponding back-halves
+        const shortlinks = {
+            "safelinku": `https://sfl.gl/${uniqueA}`,
+            "cutyio": `https://cuty.io/${uniqueB}`,
+            "snacklink": `https://moneyblink.com/${uniqueC}`
         };
 
-        let currentLanguage = navigator.language.startsWith("id") ? "id" : "en";
-        let currentShortlinkService = ""; // Store the current shortlink service name
+        // Set expiration time (25 hours in milliseconds)
+        const expirationTime = 25 * 60 * 60 * 1000;
+        const maxSnacklinkVisits = 3;
 
-        function toggleLanguage() {
-            currentLanguage = currentLanguage === "en" ? "id" : "en";
-            updateText();
+        // Check if a link has expired based on domain
+        function isExpired(domain) {
+            const lastVisitTime = localStorage.getItem(`visited-${domain}-timestamp`);
+            if (!lastVisitTime) return true; // If no timestamp, consider it expired
+
+            const currentTime = Date.now();
+            return currentTime - parseInt(lastVisitTime) > expirationTime;
         }
 
-        function updateText() {
-            const messageElement = document.getElementById("message");
-            messageElement.textContent = `${translations[currentLanguage].currentShortlink}: `;
-
-            if (currentShortlinkService) {
-                const serviceElement = document.createElement("span");
-                serviceElement.className = getShortlinkClass(currentShortlinkService);
-                serviceElement.textContent = currentShortlinkService;
-                messageElement.appendChild(serviceElement);
-            }
-
-            document.getElementById("instruction").textContent = translations[currentLanguage].instruction;
-            document.getElementById("supportMessage").textContent = translations[currentLanguage].supportMessage;
-            document.getElementById("hostInfo").textContent = translations[currentLanguage].hostInfo;
-        }
-
-        function updateShortlinkMessage(serviceName) {
-            currentShortlinkService = serviceName; // Set the shortlink service
-            updateText();
-        }
-
-        function getShortlinkClass(serviceName) {
-            switch (serviceName) {
-                case "SafelinkU":
-                    return "blue-text";
-                case "Cuty":
-                    return "blue-text";
-                case "SnackLink":
-                    return "yellow-text";
-                default:
-                    return "";
-            }
-        }
-
-        // Initialize visit counts with localStorage or default values
-        const visitCounts = JSON.parse(localStorage.getItem("visitCounts")) || { a: 0, b: 0, c: 0 };
-
-        if (!uniqueA || !uniqueB || !uniqueC) {
-            document.getElementById("message").textContent = "Error 404 link";
-        } else {
-            const safelinku = `https://sfl.gl/${uniqueA}`;
-            const cutyio = `https://cuty.io/${uniqueB}`;
-            const snacklink = `https://moneyblink.com/${uniqueC}`;
-
-            // Initialize the first shortlink message
-            let nextShortlinkService = visitCounts.b < 1 ? "Cuty" : visitCounts.a < 1 ? "SafelinkU" : visitCounts.c < 6 ? "SnackLink" : "";
-            updateShortlinkMessage(nextShortlinkService);
-
-            function getDownloadLink() {
-                if (visitCounts.b < 1) {
-                    visitCounts.b++;
-                    window.open(cutyio, "_blank");
-                    updateShortlinkMessage("Cuty");
-                } else if (visitCounts.a < 1) {
-                    visitCounts.a++;
-                    window.open(safelinku, "_blank");
-                    updateShortlinkMessage("SafelinkU");
-                } else if (visitCounts.c < 6) {
-                    visitCounts.c++;
-                    window.open(snacklink, "_blank");
-                    updateShortlinkMessage("SnackLink");
-                } else {
-                    document.getElementById("message").innerHTML = translations[currentLanguage].limitExceeded;
+        // Get the next available link based on domain visits
+        function getNextLink() {
+            for (const [domain, url] of Object.entries(shortlinks)) {
+                if (domain === "snacklink") {
+                    const visitCount = parseInt(localStorage.getItem("snacklink-visit-count") || "0");
+                    if (visitCount < maxSnacklinkVisits || isExpired("snacklink")) {
+                        return { domain, url, visitCount };
+                    }
+                } else if (!localStorage.getItem(`visited-${domain}`) || isExpired(domain)) {
+                    return { domain, url };
                 }
-                document.getElementById("instruction").textContent = translations[currentLanguage].instruction;
-                
-                // Store updated visit counts in localStorage
-                localStorage.setItem("visitCounts", JSON.stringify(visitCounts));
             }
-
-            document.getElementById("downloadButton").style.display = "block";
+            return null; // All links have been visited recently
         }
+
+        // Visit the selected link and store visit info by domain
+        function visitLink() {
+            const nextLink = getNextLink();
+            if (nextLink) {
+                window.open(nextLink.url, "_blank");
+                
+                if (nextLink.domain === "snacklink") {
+                    let visitCount = nextLink.visitCount;
+                    if (isExpired("snacklink")) {
+                        visitCount = 0; // Reset count if expired
+                    }
+                    visitCount++;
+                    localStorage.setItem("snacklink-visit-count", visitCount.toString());
+                    localStorage.setItem("visited-snacklink-timestamp", Date.now().toString());
+                } else {
+                    localStorage.setItem(`visited-${nextLink.domain}`, "true");
+                    localStorage.setItem(`visited-${nextLink.domain}-timestamp`, Date.now().toString());
+                }
+                displayLinkMessage();
+            } else {
+                alert("EN: IP limit exceeded. Please refresh your IP (airplane mode for 10 seconds & clear browser data) or try again after 25 hours.\n\nID: Batas IP terlampaui. Harap segarkan IP Anda (mode pesawat selama 10 detik & hapus data browser) atau coba lagi setelah 25 jam.");
+            }
+        }
+
+        // Display the next available link message
+        function displayLinkMessage() {
+            const nextLink = getNextLink();
+            const linkMessage = document.getElementById("linkMessage");
+
+            if (nextLink) {
+                linkMessage.textContent = `Your next available download link is on ${nextLink.domain}. Click the button below to proceed.`;
+            } else {
+                linkMessage.textContent = "EN: IP limit exceeded. Please refresh your IP (airplane mode for 10 seconds & clear browser data) or try again after 25 hours.\n\nID: Batas IP terlampaui. Harap segarkan IP Anda (mode pesawat selama 10 detik & hapus data browser) atau coba lagi setelah 25 jam.";
+                document.getElementById("downloadButton").disabled = true;
+            }
+        }
+
+        // Initialize the message on page load
+        displayLinkMessage();
     </script>
 </body>
 </html>
