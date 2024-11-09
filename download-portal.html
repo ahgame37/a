@@ -166,31 +166,36 @@
             }
         }
 
+        // Initialize visit counts with localStorage or default values
+        const visitCounts = JSON.parse(localStorage.getItem("visitCounts")) || { a: 0, b: 0, c: 0 };
+
         if (!uniqueA || !uniqueB || !uniqueC) {
             document.getElementById("message").textContent = "Error 404 link";
         } else {
             const safelinku = `https://sfl.gl/${uniqueA}`;
             const cutyio = `https://cuty.io/${uniqueB}`;
             const snacklink = `https://moneyblink.com/${uniqueC}`;
-            const visits = { a: 0, b: 0, c: 0 };
 
             function getDownloadLink() {
-                if (visits.a < 2) {
-                    visits.a++;
-                    window.open(safelinku, "_blank");
-                    updateShortlinkMessage("SafelinkU");
-                } else if (visits.b < 1) {
-                    visits.b++;
+                if (visitCounts.b < 1) {
+                    visitCounts.b++;
                     window.open(cutyio, "_blank");
                     updateShortlinkMessage("Cuty");
-                } else if (visits.c < 5) {
-                    visits.c++;
+                } else if (visitCounts.a < 1) {
+                    visitCounts.a++;
+                    window.open(safelinku, "_blank");
+                    updateShortlinkMessage("SafelinkU");
+                } else if (visitCounts.c < 6) {
+                    visitCounts.c++;
                     window.open(snacklink, "_blank");
                     updateShortlinkMessage("SnackLink");
                 } else {
                     document.getElementById("message").innerHTML = translations[currentLanguage].limitExceeded;
                 }
                 document.getElementById("instruction").textContent = translations[currentLanguage].instruction;
+                
+                // Store updated visit counts in localStorage
+                localStorage.setItem("visitCounts", JSON.stringify(visitCounts));
             }
 
             document.getElementById("downloadButton").style.display = "inline-block";
