@@ -133,11 +133,15 @@
         }
 
         function updateText() {
-            document.getElementById("message").textContent = `${translations[currentLanguage].currentShortlink}: `;
-            const serviceElement = document.createElement("span");
-            serviceElement.className = getShortlinkClass(currentShortlinkService);
-            serviceElement.textContent = currentShortlinkService;
-            document.getElementById("message").appendChild(serviceElement);
+            const messageElement = document.getElementById("message");
+            messageElement.textContent = `${translations[currentLanguage].currentShortlink}: `;
+
+            if (currentShortlinkService) {
+                const serviceElement = document.createElement("span");
+                serviceElement.className = getShortlinkClass(currentShortlinkService);
+                serviceElement.textContent = currentShortlinkService;
+                messageElement.appendChild(serviceElement);
+            }
 
             document.getElementById("instruction").textContent = translations[currentLanguage].instruction;
             document.getElementById("supportMessage").textContent = translations[currentLanguage].supportMessage;
