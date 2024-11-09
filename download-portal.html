@@ -72,6 +72,17 @@
             font-weight: bold;
             cursor: pointer;
         }
+
+        /* New text styles */
+        .highlighted-text {
+            color: #ff4081; /* Pink accent color */
+        }
+        .blue-text {
+            color: #4da6ff; /* Soft blue color */
+        }
+        .yellow-text {
+            color: #ffd700; /* Soft yellow color */
+        }
     </style>
 </head>
 <body>
@@ -82,7 +93,7 @@
         <p id="instruction" class="highlight"></p>
         <p id="hostInfo" class="highlight"></p>
         <button class="button" id="downloadButton" onclick="getDownloadLink()" style="display:none;">Get Download Link</button>
-        <p id="supportMessage" class="highlight"></p>
+        <p id="supportMessage" class="highlighted-text"></p>
     </div>
 
     <script>
@@ -114,6 +125,7 @@
         };
         
         let currentLanguage = navigator.language.startsWith("id") ? "id" : "en";
+        let currentShortlinkService = ""; // Store the current shortlink service name
 
         function toggleLanguage() {
             currentLanguage = currentLanguage === "en" ? "id" : "en";
@@ -121,14 +133,33 @@
         }
 
         function updateText() {
-            document.getElementById("message").textContent = translations[currentLanguage].initialMessage;
+            document.getElementById("message").textContent = `${translations[currentLanguage].currentShortlink}: `;
+            const serviceElement = document.createElement("span");
+            serviceElement.className = getShortlinkClass(currentShortlinkService);
+            serviceElement.textContent = currentShortlinkService;
+            document.getElementById("message").appendChild(serviceElement);
+
             document.getElementById("instruction").textContent = translations[currentLanguage].instruction;
             document.getElementById("supportMessage").textContent = translations[currentLanguage].supportMessage;
             document.getElementById("hostInfo").textContent = translations[currentLanguage].hostInfo;
         }
 
         function updateShortlinkMessage(serviceName) {
-            document.getElementById("message").textContent = `${translations[currentLanguage].currentShortlink}: ${serviceName}`;
+            currentShortlinkService = serviceName; // Set the shortlink service
+            updateText();
+        }
+
+        function getShortlinkClass(serviceName) {
+            switch (serviceName) {
+                case "SafelinkU":
+                    return "blue-text";
+                case "Cuty":
+                    return "blue-text";
+                case "SnackLink":
+                    return "yellow-text";
+                default:
+                    return "";
+            }
         }
 
         if (!uniqueA || !uniqueB || !uniqueC) {
