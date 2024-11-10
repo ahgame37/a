@@ -134,8 +134,17 @@
             document.getElementById("hostInfo").textContent = translations[currentLanguage].hostInfo;
         }
 
-        function updateShortlinkMessage(serviceName) {
-            currentShortlinkService = serviceName;
+        function updateShortlinkMessage() {
+            if (visitCounts.b < 1) {
+                currentShortlinkService = "Cuty";
+            } else if (visitCounts.a < 1) {
+                currentShortlinkService = "SafelinkU";
+            } else if (visitCounts.c < 6) {
+                currentShortlinkService = "SnackLink";
+            } else {
+                document.getElementById("message").textContent = translations[currentLanguage].limitExceeded;
+                return;
+            }
             updateText();
         }
 
@@ -152,32 +161,22 @@
                 if (visitCounts.b < 1) {
                     visitCounts.b++;
                     window.open(cutyio, "_blank");
-                    updateShortlinkMessage("Cuty");
                 } else if (visitCounts.a < 1) {
                     visitCounts.a++;
                     window.open(safelinku, "_blank");
-                    updateShortlinkMessage("SafelinkU");
                 } else if (visitCounts.c < 6) {
                     visitCounts.c++;
                     window.open(snacklink, "_blank");
-                    updateShortlinkMessage("SnackLink");
                 } else {
                     document.getElementById("message").textContent = translations[currentLanguage].limitExceeded;
                 }
                 
-                document.getElementById("instruction").textContent = translations[currentLanguage].instruction;
                 localStorage.setItem("visitCounts", JSON.stringify(visitCounts));
+                updateShortlinkMessage();
             }
 
-            let nextShortlinkService = visitCounts.b < 1 ? "Cuty" : visitCounts.a < 1 ? "SafelinkU" : visitCounts.c < 6 ? "SnackLink" : null;
-            if (nextShortlinkService) {
-                updateShortlinkMessage(nextShortlinkService);
-            } else {
-                document.getElementById("message").textContent = translations[currentLanguage].limitExceeded;
-            }
-
+            updateShortlinkMessage();
             document.getElementById("downloadButton").style.display = "inline-block";
-            updateText();
         }
     </script>
 </body>
