@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HPXLI H Game Download Portal</title>
     <style>
-        /* Soft black background styling */
         body {
             background-color: #1a1a1a;
             font-family: Arial, sans-serif;
@@ -19,7 +18,6 @@
             color: #fff;
         }
         
-        /* Overlay container for readability */
         .container {
             background: rgba(255, 255, 255, 0.1);
             padding: 20px;
@@ -30,14 +28,12 @@
             box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
         }
 
-        /* Main title styling */
         h1 {
             font-size: 24px;
-            color: #ff4081; /* Pink accent for the title */
+            color: #ff4081;
             margin-bottom: 10px;
         }
 
-        /* General text styling */
         p {
             margin: 10px 0;
             line-height: 1.5;
@@ -45,7 +41,6 @@
             color: #fff;
         }
 
-        /* Button styling */
         .button {
             padding: 10px 20px;
             margin-top: 20px;
@@ -60,7 +55,6 @@
             background-color: #e03570;
         }
 
-        /* Language toggle button */
         .language-toggle {
             position: absolute;
             top: 10px;
@@ -73,7 +67,6 @@
             cursor: pointer;
         }
 
-        /* Highlighted text */
         .highlighted-text {
             color: #ff4081;
         }
@@ -118,7 +111,7 @@
         };
         
         let currentLanguage = navigator.language.startsWith("id") ? "id" : "en";
-        let currentShortlinkService = ""; // Store the current shortlink service name
+        let currentShortlinkService = "";
 
         function toggleLanguage() {
             currentLanguage = currentLanguage === "en" ? "id" : "en";
@@ -142,7 +135,7 @@
         }
 
         function updateShortlinkMessage(serviceName) {
-            currentShortlinkService = serviceName; // Set the shortlink service
+            currentShortlinkService = serviceName;
             updateText();
         }
 
@@ -160,11 +153,11 @@
                     visitCounts.b++;
                     window.open(cutyio, "_blank");
                     updateShortlinkMessage("Cuty");
-                } else if (visitCounts.a < 2) {
+                } else if (visitCounts.a < 1) {
                     visitCounts.a++;
                     window.open(safelinku, "_blank");
                     updateShortlinkMessage("SafelinkU");
-                } else if (visitCounts.c < 5) {
+                } else if (visitCounts.c < 6) {
                     visitCounts.c++;
                     window.open(snacklink, "_blank");
                     updateShortlinkMessage("SnackLink");
@@ -176,7 +169,7 @@
                 localStorage.setItem("visitCounts", JSON.stringify(visitCounts));
             }
 
-            let nextShortlinkService = visitCounts.b < 1 ? "Cuty" : visitCounts.a < 2 ? "SafelinkU" : visitCounts.c < 5 ? "SnackLink" : null;
+            let nextShortlinkService = visitCounts.b < 1 ? "Cuty" : visitCounts.a < 1 ? "SafelinkU" : visitCounts.c < 6 ? "SnackLink" : null;
             if (nextShortlinkService) {
                 updateShortlinkMessage(nextShortlinkService);
             } else {
