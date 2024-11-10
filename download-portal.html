@@ -73,15 +73,9 @@
             cursor: pointer;
         }
 
-        /* New text styles */
+        /* Highlighted text */
         .highlighted-text {
-            color: #ff4081; /* Pink accent color */
-        }
-        .blue-text {
-            color: #4da6ff; /* Soft blue color */
-        }
-        .yellow-text {
-            color: #ffd700; /* Soft yellow color */
+            color: #ff4081;
         }
     </style>
 </head>
@@ -90,8 +84,8 @@
     <div class="container">
         <h1>HPXLI H Game Download Portal</h1>
         <p id="message">Checking available links...</p>
-        <p id="instruction" class="highlight"></p>
-        <p id="hostInfo" class="highlight"></p>
+        <p id="instruction"></p>
+        <p id="hostInfo"></p>
         <button class="button" id="downloadButton" onclick="getDownloadLink()" style="display:none;">Get Download Link</button>
         <p id="supportMessage" class="highlighted-text"></p>
     </div>
@@ -102,10 +96,9 @@
         const uniqueB = params.get("b");
         const uniqueC = params.get("c");
 
-        // Language settings
         const translations = {
             en: {
-                nextLink: "Your next link",
+                nextLink: "The shortlink you are about to go through is:",
                 initialMessage: "Please click the button below to access the link.",
                 instruction: "Please close this tab after clicking the 'Get Download Link' button below to avoid errors.",
                 supportMessage: "Shortlinks are used to support this website. Thank you for your understanding!",
@@ -138,7 +131,7 @@
 
             if (currentShortlinkService) {
                 const serviceElement = document.createElement("span");
-                serviceElement.className = getShortlinkClass(currentShortlinkService);
+                serviceElement.className = "highlighted-text";
                 serviceElement.textContent = currentShortlinkService;
                 messageElement.appendChild(serviceElement);
             }
@@ -148,35 +141,11 @@
             document.getElementById("hostInfo").textContent = translations[currentLanguage].hostInfo;
         }
 
-        function updateShortlinkMessage() {
-            // Determine which shortlink service is next based on visit counts
-            if (visitCounts.b < 1) {
-                currentShortlinkService = "Cuty";
-            } else if (visitCounts.a < 1) {
-                currentShortlinkService = "SafelinkU";
-            } else if (visitCounts.c < 6) {
-                currentShortlinkService = "SnackLink";
-            } else {
-                currentShortlinkService = "";
-                document.getElementById("message").innerHTML = translations[currentLanguage].limitExceeded;
-            }
+        function updateShortlinkMessage(serviceName) {
+            currentShortlinkService = serviceName; // Set the shortlink service
             updateText();
         }
 
-        function getShortlinkClass(serviceName) {
-            switch (serviceName) {
-                case "SafelinkU":
-                    return "blue-text";
-                case "Cuty":
-                    return "blue-text";
-                case "SnackLink":
-                    return "yellow-text";
-                default:
-                    return "";
-            }
-        }
-
-        // Initialize visit counts with localStorage or default values
         const visitCounts = JSON.parse(localStorage.getItem("visitCounts")) || { a: 0, b: 0, c: 0 };
 
         if (!uniqueA || !uniqueB || !uniqueC) {
@@ -186,26 +155,32 @@
             const cutyio = `https://cuty.io/${uniqueB}`;
             const snacklink = `https://moneyblink.com/${uniqueC}`;
 
-            // Show the correct "next link" message on page load
-            updateShortlinkMessage();
-
             function getDownloadLink() {
                 if (visitCounts.b < 1) {
                     visitCounts.b++;
                     window.open(cutyio, "_blank");
-                } else if (visitCounts.a < 1) {
+                    updateShortlinkMessage("Cuty");
+                } else if (visitCounts.a < 2) {
                     visitCounts.a++;
                     window.open(safelinku, "_blank");
-                } else if (visitCounts.c < 6) {
+                    updateShortlinkMessage("SafelinkU");
+                } else if (visitCounts.c < 5) {
                     visitCounts.c++;
                     window.open(snacklink, "_blank");
-                } 
+                    updateShortlinkMessage("SnackLink");
+                } else {
+                    document.getElementById("message").textContent = translations[currentLanguage].limitExceeded;
+                }
                 
-                // Update the "next link" text based on remaining access
-                updateShortlinkMessage();
-                
-                // Store updated visit counts in localStorage
+                document.getElementById("instruction").textContent = translations[currentLanguage].instruction;
                 localStorage.setItem("visitCounts", JSON.stringify(visitCounts));
+            }
+
+            let nextShortlinkService = visitCounts.b < 1 ? "Cuty" : visitCounts.a < 2 ? "SafelinkU" : visitCounts.c < 5 ? "SnackLink" : null;
+            if (nextShortlinkService) {
+                updateShortlinkMessage(nextShortlinkService);
+            } else {
+                document.getElementById("message").textContent = translations[currentLanguage].limitExceeded;
             }
 
             document.getElementById("downloadButton").style.display = "inline-block";
